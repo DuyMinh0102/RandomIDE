@@ -19,6 +19,7 @@ std::filesystem::path current_path = std::filesystem::current_path();
 std::vector<std::filesystem::path> selected_files;
 
 float separatorPos = 250.0f;
+float baseSeparatorPos = 250.0f;
 bool isDraggingSeparator = false;
 bool isDraggingTerminalSeparator = false;
 

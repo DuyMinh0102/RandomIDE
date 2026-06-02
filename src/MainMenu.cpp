@@ -1,14 +1,27 @@
 #include "MainMenu.h"
+#include "Runner.h"
 #include "globals.h"
 #include "imgui.h"
 #include "portable-file-dialogs.h"
+#include <filesystem>
 #include <fstream>
+
 using namespace ImGui;
 
 void MainMenuBarFunc(GLFWwindow *window) {
   ImGuiIO &io = GetIO();
 
   if (BeginMainMenuBar()) {
+    std::string activeFile = "";
+    std::string ext = "";
+    bool canRun = false;
+
+    if (activeTabIndex >= 0 && activeTabIndex < (int)openTabs.size()) {
+      activeFile = openTabs[activeTabIndex]->filepath.string();
+      ext = openTabs[activeTabIndex]->filepath.extension().string();
+      canRun = !activeFile.empty() && isRunnableLanguage(ext);
+    }
+
     if (BeginMenu("File")) {
       if (MenuItem("Open", "Ctrl + O")) {
         auto selection =
@@ -99,13 +112,13 @@ void MainMenuBarFunc(GLFWwindow *window) {
       if (MenuItem("Zoom In", "Ctrl + =")) {
         if (io.FontGlobalScale < 4.0f) {
           io.FontGlobalScale += 0.1f;
-          separatorPos += 0.1f;
+          separatorPos = baseSeparatorPos * io.FontGlobalScale;
         }
       }
       if (MenuItem("Zoom Out", "Ctrl + -")) {
         if (io.FontGlobalScale > 1.0f) {
           io.FontGlobalScale -= 0.1f;
-          separatorPos -= 0.1f;
+          separatorPos = baseSeparatorPos * io.FontGlobalScale;
         }
       }
 
@@ -119,17 +132,34 @@ void MainMenuBarFunc(GLFWwindow *window) {
       showTerminal = !showTerminal;
     }
 
+    std::string runLabel =
+        (canRun ? "Run with " + languageName(ext) : "Run Code");
+
+    float itemWidth =
+        CalcTextSize(runLabel.c_str()).x + GetStyle().FramePadding.x * 2.0f;
+
+    float rightXPosition =
+        GetCursorPosX() + GetContentRegionAvail().x - itemWidth;
+
+    SetCursorPosX(rightXPosition);
+
+    if (MenuItem(runLabel.c_str())) {
+      if (canRun) {
+        RunCurrentFile(current_path);
+      }
+    }
+
     if (io.KeyCtrl) {
       if (IsKeyPressed(ImGuiKey_Equal)) {
         if (io.FontGlobalScale < 4.0f) {
           io.FontGlobalScale += 0.1f;
-          separatorPos += 0.1f;
+          separatorPos = baseSeparatorPos * io.FontGlobalScale;
         }
       }
       if (IsKeyPressed(ImGuiKey_Minus)) {
         if (io.FontGlobalScale > 1.0f) {
           io.FontGlobalScale -= 0.1f;
-          separatorPos -= 0.1f;
+          separatorPos = baseSeparatorPos * io.FontGlobalScale;
         }
       }
       if (IsKeyPressed(ImGuiKey_0)) {
@@ -182,6 +212,10 @@ void MainMenuBarFunc(GLFWwindow *window) {
     if (io.KeyAlt) {
       if (IsKeyPressed(ImGuiKey_F4))
         glfwSetWindowShouldClose(window, true);
+    }
+
+    if (IsKeyPressed(ImGuiKey_F5) && canRun) {
+      RunCurrentFile(activeFile);
     }
 
     EndMainMenuBar();

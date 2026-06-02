@@ -1,6 +1,7 @@
 #pragma once
 #include "TextEditor.h"
 #include "imgui.h"
+#include <cstdint>
 #include <filesystem>
 #include <memory>
 #include <string>
@@ -22,6 +23,7 @@ extern std::filesystem::path current_path;
 extern std::vector<std::filesystem::path> selected_files;
 
 extern float separatorPos;
+extern float baseSeparatorPos;
 extern bool isDraggingSeparator;
 extern bool isDraggingTerminalSeparator;
 

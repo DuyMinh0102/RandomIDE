@@ -2,6 +2,7 @@
 build/
 out/
 bin/
+vendor/
 
 # CMake specific files
 CMakeCache.txt

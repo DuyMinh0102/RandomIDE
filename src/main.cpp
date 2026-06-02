@@ -8,6 +8,7 @@
 // Components
 #include "CodeEditor.h"
 #include "MainMenu.h"
+#include "Runner.h"
 #include "Terminal.h"
 #include "WelcomeScreen.h"
 #include "sidebar.h"
